@@ -41,7 +41,7 @@ export class UserController {
     //GET / users(pour récupérer la liste des utilisateurs connectés)
     @Get(":pseudo")
     getUser(@Param("pseudo") pseudo: string) {
-        console.log("getUser");
+        console.log("getUser:pseudo");
         return this.userService.findOneByPseudo(pseudo);
     }
 

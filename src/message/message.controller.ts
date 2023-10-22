@@ -15,9 +15,9 @@ export class MessageController {
 
     //POST / messages(pour envoyer un message)
     @Post()
-    add(@Body() message: CreateMessageDto) {
+    add(@Body() message: CreateMessageDto): void {
 
-        console.log("add Back message");
+        console.log("add Back message", message);
 
         //Recuération du UserModel grace au Secret...
         const user: UserModel = this.userService.findOneById(message.secret);
@@ -37,13 +37,18 @@ export class MessageController {
     //GET /messages (pour récupérer les N derniers messages)
     @Get()
     getAll(): MessageDto[] {
-        console.log("getAll back message");
+
         const messagesModel = this.messageService.getAll()
+        messagesModel.sort((a, b) => b.date.getTime() - a.date.getTime());
 
         let messages: MessageDto[] = []
-
-        for (const message of messagesModel) {
-            messages.push({ author: message.author.id, content: message.content, date: message.date, id: message.id })
+        for (let i = 0; i < 5; i++) {
+            if (i < messagesModel.length) {
+                const message = messagesModel[i]
+                messages.push({ author: message.author.id, content: message.content, date: message.date, id: message.id })
+            } else {
+                break;
+            }
         }
 
         return messages;
