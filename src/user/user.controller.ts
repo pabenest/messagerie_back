@@ -25,11 +25,17 @@ export class UserController {
         });
     }
 
-    //GET / users(pour récupérer la liste des utilisateurs connectés)
+    // //GET / users(pour récupérer la liste des utilisateurs connectés)
+    // @Get()
+    // getConnectedUsers() {
+    //     console.log("getConnectedUsers");
+    //     return this.userService.getConnectedUsers()
+    // }
+
     @Get()
-    getConnectedUsers() {
-        console.log("getConnectedUsers");
-        return this.userService.getConnectedUsers()
+    getAllUser() {
+        console.log("getUser");
+        return this.userService.getAll()
     }
 
     //GET / users(pour récupérer la liste des utilisateurs connectés)

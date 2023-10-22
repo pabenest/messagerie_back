@@ -95,7 +95,7 @@ export class UserService {
         }
     }
 
-    private getAll(): UserModel[] {
+    public getAll(): UserModel[] {
         return [...this.userList];
     }
 

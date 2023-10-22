@@ -4,6 +4,7 @@ import { CreateMessageDto } from '@core/dto/message/CreateMessageDto';
 import { UserModel } from '@core/model/user/user.model';
 import { UserService } from 'src/user/user.service';
 import { UnexpectedServiceError } from '@common/error';
+import { MessageDto } from '@core/dto/message/MessageDto';
 
 @Controller('message')
 export class MessageController {
@@ -23,7 +24,7 @@ export class MessageController {
 
         if (user) {
             this.messageService.add({
-                author: user.id,
+                author: user,
                 content: message.content,
                 date: new Date()
             });
@@ -35,9 +36,16 @@ export class MessageController {
 
     //GET /messages (pour récupérer les N derniers messages)
     @Get()
-    getAll() {
+    getAll(): MessageDto[] {
         console.log("getAll back message");
-        const messages = this.messageService.getAll()
+        const messagesModel = this.messageService.getAll()
+
+        let messages: MessageDto[] = []
+
+        for (const message of messagesModel) {
+            messages.push({ author: message.author.id, content: message.content, date: message.date, id: message.id })
+        }
+
         return messages;
     }
 
