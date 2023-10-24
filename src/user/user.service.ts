@@ -112,17 +112,6 @@ export class UserService {
         return [...this.userList];
     }
 
-    @Cron("*/2 * * * *")
-    handleCron() {
-        for (const user of this.userList) {
 
-            const currentDate = new Date()
-            currentDate.setMinutes(currentDate.getMinutes() - 1);
-
-            if (user.lastPing < currentDate) {
-                this.deconnecte(user.id)
-            }
-        }
-    }
 
 }

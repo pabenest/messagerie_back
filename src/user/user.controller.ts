@@ -6,6 +6,7 @@ import { MOCK_USER } from './mock-user'
 import { UpdateUserDto } from '@core/dto/user/UpdateUserDto';
 import { PingUserDto } from '@core/dto/user/PingUserDto';
 import { MessageService } from 'src/message/message.service';
+import { Cron } from '@nestjs/schedule';
 
 @Controller('user')
 export class UserController {
@@ -81,5 +82,17 @@ export class UserController {
     ping(@Param("id") id: string, ping: PingUserDto) {
 
         this.userService.ping(id)
+    }
+    @Cron("*/1 * * * *")
+    handleCron() {
+        for (const user of this.userService.getAll()) {
+
+            const currentDate = new Date()
+            currentDate.setMinutes(currentDate.getMinutes() - 1);
+
+            if (user.lastPing < currentDate) {
+                this.deconnecte(user.id)
+            }
+        }
     }
 }
