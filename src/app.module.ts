@@ -5,9 +5,10 @@ import { UserService } from './user/user.service';
 import { MessageService } from './message/message.service';
 import { MessageController } from './message/message.controller';
 import { UserController } from './user/user.controller';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [MessageModule, UserModule],
+  imports: [MessageModule, UserModule, ScheduleModule.forRoot()],
   controllers: [UserController],
   providers: [UserService],
 })

@@ -5,4 +5,5 @@ export interface UserModel {
     pseudo: string;
     secret: string;
     lastPing: Date;
+    sendLogOut: boolean
 }

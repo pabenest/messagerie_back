@@ -13,8 +13,6 @@ export class MessageService {
     public add(message: Omit<MessageModel, "id">) {
         const id: string = uuidv4();
         this.messageList.push({ id, ...message });
-
-        console.log(this.messageList)
     }
 
     public getAll(): MessageModel[] {

@@ -4,6 +4,7 @@ import { randomUUID } from 'crypto';
 import { MOCK_USER } from './mock-user';
 import { UnexpectedError, UnexpectedServiceError } from '@common/error';
 import { v4 as uuidv4 } from 'uuid';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class UserService {
@@ -40,7 +41,7 @@ export class UserService {
 
     }
 
-    public add(user: Omit<UserModel, "id" | "lastPing">): string {
+    public add(user: Omit<UserModel, "id" | "lastPing" | "sendLogOut">): string {
 
         const userExist = this.findOneByPseudo(user.pseudo);
 
@@ -49,14 +50,14 @@ export class UserService {
         } else {
             const id: string = uuidv4();
             const lastPing = new Date()
-            this.userList.push({ id, lastPing, ...user });
+            this.userList.push({ id, lastPing, sendLogOut: false, ...user });
             return id
         }
     }
 
 
 
-    public update(id: string, user: Omit<UserModel, "id" | "lastPing">) {
+    public update(id: string, user: Omit<UserModel, "id" | "lastPing" | "sendLogOut">) {
 
         const userDatabase = this.findOneById(id)
 
@@ -85,11 +86,23 @@ export class UserService {
         return connected;
     }
 
+    public deconnecte(id: string) {
+        let user = this.findOneById(id)
+        user.sendLogOut = true
+    }
+
+    public connecte(id: string) {
+        let user = this.findOneById(id)
+        this.ping(user.id)
+    }
+
     public ping(secret: string) {
-        const user: UserModel = this.findOneBySecret(secret);
+        const user: UserModel = this.findOneById(secret);
 
         if (user) {
+            console.log("ping user:", user.id);
             user.lastPing = new Date()
+            user.sendLogOut = false
         } else {
             throw new UnexpectedServiceError("L'utilisateur n'existe pas")
         }
@@ -97,6 +110,19 @@ export class UserService {
 
     public getAll(): UserModel[] {
         return [...this.userList];
+    }
+
+    @Cron("*/2 * * * *")
+    handleCron() {
+        for (const user of this.userList) {
+
+            const currentDate = new Date()
+            currentDate.setMinutes(currentDate.getMinutes() - 1);
+
+            if (user.lastPing < currentDate) {
+                this.deconnecte(user.id)
+            }
+        }
     }
 
 }

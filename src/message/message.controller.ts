@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Inject, NotFoundException, Param, ParseIntPipe, Post, Put, forwardRef } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from '@core/dto/message/CreateMessageDto';
 import { UserModel } from '@core/model/user/user.model';
@@ -11,7 +11,8 @@ export class MessageController {
 
 
     constructor(
-        private readonly messageService: MessageService, private readonly userService: UserService) { }
+        private readonly messageService: MessageService,
+        private readonly userService: UserService) { }
 
     //POST / messages(pour envoyer un message)
     @Post()
