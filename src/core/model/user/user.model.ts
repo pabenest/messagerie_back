@@ -1,7 +1,5 @@
-import { WithId } from "@common/model/WithId";
-
 export interface UserModel {
-    id: string //UUID
+    id: string
     pseudo: string;
     secret: string;
     lastPing: Date;

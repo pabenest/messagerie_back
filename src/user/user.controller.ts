@@ -7,6 +7,10 @@ import { UpdateUserDto } from '@core/dto/user/UpdateUserDto';
 import { PingUserDto } from '@core/dto/user/PingUserDto';
 import { MessageService } from 'src/message/message.service';
 import { Cron } from '@nestjs/schedule';
+import { generatePseudo, generateSecret } from '@common/stringUtils';
+import { CreateMessageDto } from '@core/dto/message/CreateMessageDto';
+import { identity } from 'rxjs';
+import { UnexpectedServiceError } from '@common/error';
 
 @Controller('user')
 export class UserController {
@@ -18,7 +22,7 @@ export class UserController {
 
     //POST /users (pour créer un utilisateur et récupérer son uuid)    
     @Post()
-    add(@Body() user: createUserDto): string {
+    addUser(@Body() user: createUserDto): string {
 
         //On recherche le user par le pseudo s'il existe on retourne son UUID
         //sinon on réalise la création puis on retourne son UUID
@@ -41,25 +45,40 @@ export class UserController {
     }
 
     //GET / users(pour récupérer la liste des utilisateurs connectés)
-    @Get(":pseudo")
-    connecte(@Param("pseudo") pseudo: string) {
-        const author = this.userService.findOneByPseudo(pseudo)
-        if (author) {
-            this.userService.connecte(author.id)
-            const content = `${author.pseudo} vient de se connecter`
-            this.messageService.add({ author, content, date: new Date() })
+    @Post("login")
+    login(@Body() secret: string) {
+
+
+        let author = this.userService.findOneBySecret(secret)
+        if (!author) {
+            const secretNew = generateSecret();
+            this.userService.add({ pseudo: generatePseudo(), secret: secretNew })
+            author = this.userService.findOneBySecret(secretNew)
         }
+
+        this.userService.login(author)
+        const content = `${author.pseudo} vient de se connecter`
+        this.messageService.add({ author, content, date: new Date() })
 
         return author;
     }
 
     //PUT / users /: uuid(pour modifier le pseudo d’un utilisateur)
-    @Put()
-    update(@Body() user: UpdateUserDto) {
+    @Put(":id/")
+    update(@Param("id") id: string, @Body() user: UpdateUserDto) {
 
-        this.userService.update(
-            user.id, { pseudo: user.pseudo, secret: user.secret }
-        )
+        let author = this.userService.findOneByIdAndSecret(id, user.secret)
+        const pseudoOld = author.pseudo
+        if (author) {
+            console.log("changement de pseudo")
+            author = this.userService.update(
+                id, { pseudo: user.pseudo, secret: user.secret }
+            )
+            const content = `${pseudoOld} a maintenant pour pseudo : ${author.pseudo}`
+            this.messageService.add({ author, content, date: new Date() })
+            return { id, pseudo: author.pseudo }
+        }
+        return null;
     }
 
     @Put(":id/logout")
@@ -71,17 +90,19 @@ export class UserController {
             if (!author.sendLogOut) {
                 const content = `${author.pseudo} vient de se deconnecter `
                 this.messageService.add({ author, content, date: new Date() })
-                this.userService.deconnecte(id)
             }
-            this.userService.deconnecte(id)
+            this.userService.deconnecte(author)
         }
     }
 
     //POST / users /: uuid / ping(pour indiquer au serveur qu’un utilisateur est toujours connecté
-    @Post(":id")
-    ping(@Param("id") id: string, ping: PingUserDto) {
+    @Post(":id/ping")
+    ping(@Param("id") id: string, @Body() ping: PingUserDto) {
 
-        this.userService.ping(id)
+        const user = this.userService.findOneByIdAndSecret(id, ping.secret)
+        if (user) {
+            this.userService.ping(user)
+        }
     }
     @Cron("*/1 * * * *")
     handleCron() {
@@ -93,6 +114,29 @@ export class UserController {
             if (user.lastPing < currentDate) {
                 this.deconnecte(user.id)
             }
+        }
+    }
+
+
+
+    //POST / messages(pour envoyer un message) /users/:uuid/messages
+    @Post(":id/messages")
+    addMessage(@Param('id') id, @Body() message: CreateMessageDto): void {
+
+        console.log("add Back message", message);
+
+        //Recuération du UserModel grace au Secret...
+        const user: UserModel = this.userService.findOneByIdAndSecret(id, message.secret);
+
+        if (user) {
+            this.messageService.add({
+                author: user,
+                content: message.content,
+                date: new Date()
+            });
+
+        } else {
+            throw new UnexpectedServiceError("L'utilisateur n'a pas été trouvé.")
         }
     }
 }

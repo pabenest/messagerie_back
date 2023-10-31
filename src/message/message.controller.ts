@@ -14,26 +14,7 @@ export class MessageController {
         private readonly messageService: MessageService,
         private readonly userService: UserService) { }
 
-    //POST / messages(pour envoyer un message)
-    @Post()
-    add(@Body() message: CreateMessageDto): void {
 
-        console.log("add Back message", message);
-
-        //Recuération du UserModel grace au Secret...
-        const user: UserModel = this.userService.findOneById(message.secret);
-
-        if (user) {
-            this.messageService.add({
-                author: user,
-                content: message.content,
-                date: new Date()
-            });
-
-        } else {
-            throw new UnexpectedServiceError("L'uttilisateur n'a pas été trouvé")
-        }
-    }
 
     //GET /messages (pour récupérer les N derniers messages)
     @Get()

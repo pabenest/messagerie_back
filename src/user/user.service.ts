@@ -5,10 +5,25 @@ import { MOCK_USER } from './mock-user';
 import { UnexpectedError, UnexpectedServiceError } from '@common/error';
 import { v4 as uuidv4 } from 'uuid';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { generateSecret } from '@common/stringUtils';
 
 @Injectable()
 export class UserService {
     private userList: UserModel[] = MOCK_USER;
+
+    public findOneByIdAndSecret(id: string, secret: string): UserModel | null {
+        if (id && secret) {
+            if (secret !== null) {
+                const all = this.getAll();
+                for (const user of all) {
+                    if (user.id === id && user.secret === secret) {
+                        return user;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     public findOneById(id: string): UserModel {
         for (const user of this.userList) {
@@ -30,11 +45,13 @@ export class UserService {
 
     public findOneBySecret(secret: string): UserModel | null {
 
-        const all = this.getAll()
+        if (secret !== null) {
+            const all = this.getAll()
 
-        for (const user of all) {
-            if (secret === user.secret) {
-                return user;
+            for (const user of all) {
+                if (secret === user.secret) {
+                    return user;
+                }
             }
         }
         return null;
@@ -48,18 +65,16 @@ export class UserService {
         if (userExist) {
             return userExist.id
         } else {
-            const id: string = uuidv4();
+            const id: string = generateSecret();
             const lastPing = new Date()
             this.userList.push({ id, lastPing, sendLogOut: false, ...user });
             return id
         }
     }
 
-
-
     public update(id: string, user: Omit<UserModel, "id" | "lastPing" | "sendLogOut">) {
 
-        const userDatabase = this.findOneById(id)
+        const userDatabase = this.findOneByIdAndSecret(id, user.secret)
 
         if (userDatabase) {
             userDatabase.pseudo = user.pseudo
@@ -67,6 +82,7 @@ export class UserService {
         } else {
             throw new UnexpectedServiceError("L'utilisateur n'existe pas")
         }
+        return userDatabase;
     }
 
     public getConnectedUsers() {
@@ -86,25 +102,26 @@ export class UserService {
         return connected;
     }
 
-    public deconnecte(id: string) {
-        let user = this.findOneById(id)
-        user.sendLogOut = true
-    }
-
-    public connecte(id: string) {
-        let user = this.findOneById(id)
-        this.ping(user.id)
-    }
-
-    public ping(secret: string) {
-        const user: UserModel = this.findOneById(secret);
+    public deconnecte(user: UserModel) {
 
         if (user) {
-            console.log("ping user:", user.id);
+            user.sendLogOut = true
+        } else {
+            throw new UnexpectedServiceError("Le paramètre user est null.")
+        }
+    }
+
+    public login(user: UserModel) {
+        this.ping(user)
+    }
+
+    public ping(user: UserModel) {
+
+        if (user) {
             user.lastPing = new Date()
             user.sendLogOut = false
         } else {
-            throw new UnexpectedServiceError("L'utilisateur n'existe pas")
+            throw new UnexpectedServiceError("Le paramètre user est null.")
         }
     }
 
