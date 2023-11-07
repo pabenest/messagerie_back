@@ -1,7 +1,7 @@
 export interface UserModel {
-    id: string
-    pseudo: string;
-    secret: string;
-    lastPing: Date;
-    sendLogOut: boolean
+  id: string;
+  lastPing: Date;
+  pseudo: string;
+  secret: string;
+  sendLogOut: boolean;
 }

@@ -1,7 +1,7 @@
 import { AppError } from "./AppError";
 
-export class UnexpectedError extends AppError { }
+export class UnexpectedError extends AppError {}
 
-export class UnexpectedRepositoryError extends UnexpectedError { }
+export class UnexpectedRepositoryError extends UnexpectedError {}
 
-export class UnexpectedServiceError extends UnexpectedError { }
+export class UnexpectedServiceError extends UnexpectedError {}

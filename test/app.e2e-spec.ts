@@ -1,9 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-describe('AppController (e2e)', () => {
+import { type INestApplication } from "@nestjs/common";
+import { Test, type TestingModule } from "@nestjs/testing";
+import request from "supertest";
+
+import { AppModule } from "../src/app.module";
+
+describe("AppController (e2e)", () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -15,10 +20,7 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it("/ (GET)", () => {
+    return request(app.getHttpServer()).get("/").expect(200).expect("Hello World!");
   });
 });

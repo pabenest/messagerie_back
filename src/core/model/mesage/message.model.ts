@@ -1,9 +1,8 @@
-import { WithId } from "@common/model/WithId";
-import { UserModel } from "../user/user.model";
+import { type UserModel } from "../user/user.model";
 
 export interface MessageModel {
-    id: string;
-    author: UserModel;
-    content: string;
-    date: Date;
+  author: UserModel;
+  content: string;
+  date: Date;
+  id: string;
 }

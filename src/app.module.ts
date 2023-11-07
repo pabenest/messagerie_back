@@ -1,15 +1,14 @@
-import { Module } from '@nestjs/common';
-import { MessageModule } from './message/message.module';
-import { UserModule } from './user/user.module';
-import { UserService } from './user/user.service';
-import { MessageService } from './message/message.service';
-import { MessageController } from './message/message.controller';
-import { UserController } from './user/user.controller';
-import { ScheduleModule } from '@nestjs/schedule';
+import { Module } from "@nestjs/common";
+import { ScheduleModule } from "@nestjs/schedule";
+
+import { MessageModule } from "./message/message.module";
+import { UserController } from "./user/user.controller";
+import { UserModule } from "./user/user.module";
+import { UserService } from "./user/user.service";
 
 @Module({
   imports: [MessageModule, UserModule, ScheduleModule.forRoot()],
   controllers: [UserController],
   providers: [UserService],
 })
-export class AppModule { }
+export class AppModule {}
