@@ -1,4 +1,4 @@
 export interface UpdateUserDto {
-    pseudo: string;
-    secret: string;
+  pseudo: string;
+  secret: string;
 }

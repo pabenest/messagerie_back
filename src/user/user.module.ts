@@ -1,7 +1,8 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { UserController } from './user.controller';
-import { UserService } from './user.service';
-import { MessageModule } from 'src/message/message.module';
+import { forwardRef, Module } from "@nestjs/common";
+import { MessageModule } from "src/message/message.module";
+
+import { UserController } from "./user.controller";
+import { UserService } from "./user.service";
 
 @Module({
   imports: [forwardRef(() => MessageModule)],
@@ -9,4 +10,4 @@ import { MessageModule } from 'src/message/message.module';
   providers: [UserService],
   exports: [UserService],
 })
-export class UserModule { }
+export class UserModule {}

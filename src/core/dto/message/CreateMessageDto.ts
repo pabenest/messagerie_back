@@ -1,5 +1,4 @@
 export interface CreateMessageDto {
-    content: string;
-    secret: string;
+  content: string;
+  secret: string;
 }
-
