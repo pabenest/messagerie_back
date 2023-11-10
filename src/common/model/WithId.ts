@@ -1,11 +1,7 @@
-export interface WithId {
-  id: number;
-}
+import z from "zod";
 
-export function findById<T>(type: WithId[], value: T) {
-  return type.find(x => x.id === value) ?? null;
-}
+export const withIdSchema = z.object({
+  id: z.string().uuid(),
+});
 
-export function getIncrement(elementsWithId: WithId[]): number {
-  return elementsWithId.length > 0 ? Math.max(...elementsWithId.map(x => x.id)) + 1 : 1;
-}
+export type WithId = z.infer<typeof withIdSchema>;

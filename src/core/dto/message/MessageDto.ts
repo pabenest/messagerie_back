@@ -1,10 +1,10 @@
+import { withIdSchema } from "@common/model/WithId";
 import z from "zod";
 
-export const createMessageDtoSchema = z.object({
-  content: z.string(),
-  author: z.string(),
+import { createMessageDtoSchema } from "./CreateMessageDto";
+
+export const messageDtoSchema = createMessageDtoSchema.extend(withIdSchema.shape).extend({
   date: z.date(),
-  id: z.string(),
 });
 
-export type MessageDto = z.infer<typeof createMessageDtoSchema>;
+export type MessageDto = z.infer<typeof messageDtoSchema>;

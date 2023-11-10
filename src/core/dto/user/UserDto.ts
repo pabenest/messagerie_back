@@ -1,7 +1,8 @@
-import z from "zod";
+import { withIdSchema } from "@common/model/WithId";
+import type z from "zod";
 
-export const userDtoSchema = z.object({
-  id: z.string(),
-  pseudo: z.string(),
-});
+import { createUserDtoSchema } from "./CreateUserDto";
+
+export const userDtoSchema = createUserDtoSchema.extend(withIdSchema.shape);
+
 export type UserDto = z.infer<typeof userDtoSchema>;

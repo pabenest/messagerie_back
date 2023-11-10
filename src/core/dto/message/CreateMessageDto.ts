@@ -1,8 +1,8 @@
 import z from "zod";
 
-export const createMessageDto = z.object({
+export const createMessageDtoSchema = z.object({
   content: z.string(),
   secret: z.string(),
 });
 
-export type CreateMessageDto = z.infer<typeof createMessageDto>;
+export type CreateMessageDto = z.infer<typeof createMessageDtoSchema>;
