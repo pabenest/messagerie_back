@@ -1,3 +1,8 @@
+import z from "zod"; 
 import { type UserDto } from "./UserDto";
 
-export type createUserDto = Omit<UserDto, "id">;
+export const createUserDtoSchema = z.object({
+  pseudo: z.string(),
+});
+
+export type CreateUserDto = Omit<UserDto, "id">;

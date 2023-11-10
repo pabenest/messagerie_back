@@ -4,11 +4,13 @@ import { CreateMessageDto } from "@core/dto/message/CreateMessageDto";
 import { PingUserDto } from "@core/dto/user/PingUserDto";
 import { UpdateUserDto } from "@core/dto/user/UpdateUserDto";
 import { UserModel } from "@core/model/user/user.model";
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, UseGuards, UsePipes } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { MessageService } from "src/message/message.service";
 
 import { UserService } from "./user.service";
+import { ZodValidationPipe } from "@core/pipes/ZodValidationPipe";
+import { createMessageDtoSchema } from "@core/dto/message/MessageDto";
 
 @Controller("user")
 @UseGuards(UserAuthGuard)
@@ -97,6 +99,7 @@ export class UserController {
   //POST / messages(pour envoyer un message) /users/:uuid/messages
   @Post(":id/messages")
   @UserControl(UserControlType.ID_AND_SECRET)
+  @UsePipes(new ZodValidationPipe(createMessageDtoSchema))
   addMessage(@Body() message: CreateMessageDto, @UserAuthGuard.authUser() author: UserModel) {
     this.messageService.add({
       author,
